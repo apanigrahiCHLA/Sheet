@@ -28,7 +28,7 @@ chmod +x find_urls.sh
 run: ./find_urls.sh
  
       - name: Upload URL list as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: found-urls
           path: found_urls.txt
