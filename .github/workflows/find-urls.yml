@@ -1,35 +1,12 @@
-name: Find URLs
- 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
- 
-jobs:
-  find-urls:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
- 
-      - name: Create URL finder script
-        run: |
-          echo '#!/bin/bash' > find_urls.sh
-          echo '> found_urls.txt' >> find_urls.sh
-          echo 'find . -type f ! -path "./.git/*" ! -path "./node_modules/*" | while read -r file; do' >> find_urls.sh
-          echo '  grep -Eo "http[s]"]+|www"]+" \"$file\" >> found_urls.txt' >> find_urls.sh
-          echo 'done' >> find_urls.sh
-          echo 'sort -u found_urls.txt -o found_urls.txt' >> find_urls.sh
-          echo 'cat found_urls.txt' >> find_urls.sh
-          chmod +x find_urls.sh
- 
-      - name: Run URL finder
-        run: ./find_urls.sh
- 
-      - name: Upload URL list as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: found-urls
-          path: found_urls.txt
- 
+- name: Create and run URL finder script
+  run: |
+    echo "Searching for URLs in files..."
+    > found_urls.txt
+    find . -type f ! -path "./.git/*" ! -path "./node_modules/*" ! -name '*.png' ! -name '*.jpg' ! -name '*.jpeg' ! -name '*.gif' ! -name '*.ico' | while read -r file; do
+      if file "$file" | grep -q text; then
+        grep -Eoi 'http[s]?://[^"'\'' )>\]]+|www\.[^"'\'' )>\]]+' "$file" >> found_urls.txt || true
+      fi
+    done
+    sort -u found_urls.txt -o found_urls.txt
+    echo "✅ Found URLs:"
+    cat found_urls.txt || echo "No URLs found."
