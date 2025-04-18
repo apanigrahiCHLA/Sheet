@@ -1,4 +1,4 @@
-- name: Create and run URL finder script
+name: Create and run URL finder script
   run: |
     echo "Searching for URLs in files..."
     > found_urls.txt
