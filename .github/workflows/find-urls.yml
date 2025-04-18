@@ -18,7 +18,7 @@ jobs:
           echo '#!/bin/bash' > find_urls.sh
           echo '> found_urls.txt' >> find_urls.sh
           echo 'find . -type f ! -path "./.git/*" ! -path "./node_modules/*" | while read -r file; do' >> find_urls.sh
-          echo '  grep -Eo "http[s]?://[^ )\"]+|www\\.[^ )\"]+" \"$file\" >> found_urls.txt' >> find_urls.sh
+          echo '  grep -Eo "http[s]"]+|www"]+" \"$file\" >> found_urls.txt' >> find_urls.sh
           echo 'done' >> find_urls.sh
           echo 'sort -u found_urls.txt -o found_urls.txt' >> find_urls.sh
           echo 'cat found_urls.txt' >> find_urls.sh
