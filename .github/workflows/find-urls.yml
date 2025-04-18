@@ -11,23 +11,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
  
       - name: Create URL finder script
         run: |
-          echo '#!/bin/bash' > find_urls.sh
-          echo '> found_urls.txt' >> find_urls.sh
-          echo 'find . -type f ! -path "./.git/*" ! -path "./node_modules/*" | while read -r file; do' >> find_urls.sh
-          echo ' grep -Eo "http[s]?://[^ )\"]+|www\\.[^ )\"]+" \"$file\" >> found_urls.txt' >> find_urls.sh
-          echo 'done' >> find_urls.sh
-          echo 'sort -u found_urls.txt -o found_urls.txt' >> find_urls.sh
-          echo 'cat found_urls.txt' >> find_urls.sh
+          cat << 'EOF' > find_urls.sh
+          #!/bin/bash
+          # Clear output file
+          > found_urls.txt
+
+          find . -type f -not -path './.git/*' -not -path './node_modules/*' | while read -r file; do
+             grep -Eio '(https?://[^\s<>"]+|www\.[^\s<>"]+)' "$file" >> found_urls.txt
+          done
+
+          sort -u found_urls.txt -o found_urls.txt
+
+          if [ -s found_urls.txt ]; then
+             echo "Found URLs:"
+             cat found_urls.txt
+          else
+             echo "No URLs found."
+          fi
+          EOF
           chmod +x find_urls.sh
- 
+          
       - name: Run URL finder
         run: ./find_urls.sh
  
       - name: Upload URL list as artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: found-urls
